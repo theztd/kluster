@@ -30,8 +30,6 @@ units:
   - haproxy.service
   - chronyd.service
 
-etc-group: true
-etc-passwd: true
 
 postprocess:
   - |
