@@ -12,6 +12,8 @@ COPY shared/virc /etc/virc
 
 # Install k0s
 RUN curl -sSf https://get.k0s.sh | sh
+RUN mkdir -p /var/lib/cni && \
+    ln -s /var/lib/cni /opt/cni
 
 # Install stern
 RUN curl -kL -o /tmp/stern.tgz https://github.com/stern/stern/releases/download/v1.32.0/stern_1.32.0_linux_amd64.tar.gz && \
