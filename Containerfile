@@ -11,8 +11,7 @@ COPY shared/99-custom_shell.sh /etc/profile.d/99-custom_shell.sh
 COPY shared/virc /etc/virc
 
 # Install k0s
-RUN curl -sSf https://get.k0s.sh | sh && \
-   k0s kubectl completion bash > /etc/bash_completion.sh
+RUN curl -sSf https://get.k0s.sh | sh
 
 # Install stern
 RUN curl -kL -o /tmp/stern.tgz https://github.com/stern/stern/releases/download/v1.32.0/stern_1.32.0_linux_amd64.tar.gz && \
