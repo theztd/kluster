@@ -22,7 +22,7 @@ Components:
 ```bash
 podman run --rm --privileged -v /dev:/dev -v /var/lib/containers:/var/lib/containers -v /:/target \
              --pid=host --security-opt label=type:unconfined_t \
-             registry.gitlab.com/fedora/bootc/base-images/fedora-bootc-minimal:40-amd64 \
+             ghcr.io/theztd/kluster:amd64 \
              bootc install to-existing-root --root-ssh-authorized-keys /target/root/.ssh/authorized_keys
 
 ```
