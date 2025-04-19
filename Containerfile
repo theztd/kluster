@@ -9,10 +9,10 @@ RUN dnf install -y \
     && dnf clean all
 
 # Switch from NetworkManager to systemd-networkd
-RUN systemctl enable systemd-networkd.service \
-    && systemctl enable systemd-resolved.service \
-    && systemctl mask NetworkManager.service \
-    && systemctl mask NetworkManager-dispatcher.service
+# RUN systemctl enable systemd-networkd.service \
+#     && systemctl enable systemd-resolved.service \
+#     && systemctl mask NetworkManager.service \
+#     && systemctl mask NetworkManager-dispatcher.service
 
 COPY shared/99-custom_shell.sh /etc/profile.d/99-custom_shell.sh
 COPY shared/virc /etc/virc
