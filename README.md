@@ -31,3 +31,17 @@ podman run --rm --privileged -v /dev:/dev -v /var/lib/containers:/var/lib/contai
 ## 2nd day operations (manage)
 
 
+
+
+## Create new user
+
+```bash
+# create new user
+# add him to group system:masters
+# generate client config file
+k0s kubeconfig create --groups "system:masters" new-user > config.yaml
+
+# add user to another roles
+k create clusterrolebinding marek --clusterrole=cluster-admin --user=marek
+
+```
