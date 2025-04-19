@@ -1,0 +1,12 @@
+---
+- name: Set hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Include controller tasks
+  ansible.builtin.include_tasks: controller.yaml
+  when: "'controllers' in group_names"
+
+- name: Include worker tasks
+  ansible.builtin.include_tasks: worker.yaml
+  when: "'workers' in group_names"

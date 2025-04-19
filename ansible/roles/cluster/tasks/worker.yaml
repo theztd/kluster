@@ -1,0 +1,21 @@
+---
+- name: Create file with join token
+  ansible.builtin.copy:
+    content: |
+      {{ k0s_join_token }}
+
+    dest: /tmp/token_file.yaml
+    mode: "0600"
+    owner: root
+
+- name: Join worker node
+  ansible.builtin.shell: >
+    k0s install worker --token-file /tmp/token_file.yaml
+  args:
+    creates: /etc/systemd/system/k0sworker.service
+
+- name: Start and enable k0s worker service
+  ansible.builtin.systemd:
+    name: k0sworker
+    enabled: true
+    state: started

@@ -1,0 +1,26 @@
+---
+- name: Prepare k0s dirs
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0644"
+  with_items:
+    - /etc/k0s
+
+- name: Deploy k0s config
+  ansible.builtin.template:
+    src: k0s.yaml.j2
+    dest: /etc/k0s/k0s.yaml
+    mode: "0644"
+
+- name: Join worker node
+  ansible.builtin.shell: >
+    k0s install controller --enable-worker -c /etc/k0s/k0s.yaml
+  args:
+    creates: /etc/systemd/system/k0scontroller.service
+
+- name: Start and enable k0s controller service
+  ansible.builtin.systemd:
+    name: k0scontroller.service
+    enabled: true
+    state: started

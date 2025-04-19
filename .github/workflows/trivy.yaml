@@ -1,0 +1,45 @@
+name: Build and Scan bootc Image
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-scan:
+    name: Build and Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set image variables
+        id: vars
+        run: |
+          IMAGE=ghcr.io/${{ github.repository }}
+          echo "image=${IMAGE,,}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=$(git rev-parse --short ${{ github.sha }})" >> "$GITHUB_OUTPUT"
+
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+
+      - name: Scan image from GHCR
+        env:
+          TRIVY_USERNAME: ${{ secrets.GITHUB_ACTOR }}
+          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          trivy image \
+            -f json -o trivy-report.json \
+            --exit-code 1 \
+            --severity CRITICAL,HIGH \
+            --ignore-unfixed \
+            --no-progress \
+            ${image}:${short_sha}
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy-report.json

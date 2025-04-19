@@ -1,0 +1,8 @@
+---
+- name: Setup k0s cluster
+  hosts: controllers, workers
+  roles:
+    - role: cluster
+      tags:
+        - cluster
+        - cp
