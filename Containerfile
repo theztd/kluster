@@ -43,14 +43,11 @@ RUN systemctl mask \
       remote-cryptsetup.target \
       remote-fs.target \
       sssd.service \
-      systemd-oomd.service \
       systemd-pstore.service \
-      systemd-userdbd.socket \
-      systemd-resolved.service
+      systemd-userdbd.socket
 
 # Optional disables (not masked – easy to re-enable later)
 RUN systemctl disable \
-      getty@.service \
       nfs-client.target \
       dnf-makecache.timer \
       rpmdb-migrate.service \
