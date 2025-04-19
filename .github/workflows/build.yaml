@@ -1,0 +1,54 @@
+name: Build bootc image
+
+on:
+  push:
+    branches:
+      - main
+      - test-build
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [amd64]   # , arm64]
+    outputs:
+      image: ${{ steps.vars.outputs.image }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU for cross-arch build
+        uses: docker/setup-qemu-action@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y buildah jq
+
+      - name: Set image variables
+        id: vars
+        run: |
+          IMAGE=ghcr.io/${{ github.repository }}
+          echo "image=${IMAGE,,}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=$(git rev-parse --short ${{ github.sha }})" >> "$GITHUB_OUTPUT"
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | buildah login -u ${{ github.actor }} --password-stdin ghcr.io
+
+      - name: Build and push image
+        run: |
+          today="$(date +%y%m%d-%H)"
+          image=${{ steps.vars.outputs.image }}
+          short_sha=${{ steps.vars.outputs.short_sha }}
+          arch=${{ matrix.arch }}
+          buildah bud --arch ${arch} --tag ${image}:${short_sha} -f Containerfile .
+          buildah tag ${image}:${short_sha} ${image}:${arch}
+          buildah tag ${image}:${short_sha} ${image}:${arch}-${today}
+          buildah push ${image}:${short_sha}
+          buildah push ${image}:${arch} 
+          buildah push ${image}:${arch}-${today}

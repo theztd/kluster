@@ -1,33 +1,56 @@
-# Base image: Fedora 40 minimal OS
-FROM registry.fedoraproject.org/fedora:40-minimal
+FROM registry.gitlab.com/fedora/bootc/base-images/fedora-bootc-minimal:40-amd64 AS base
 
-# Labels to mark this as a bootable container image
-LABEL containers.bootc="1" \
-      ostree.bootable="1"
-
-# Install base system packages and required tools (Fedora 40)
+# Přidej balíčky přes DNF (nutné pro systemd prostředí)
 RUN dnf install -y \
-      bootc \
+      systemd-networkd \
+      htop \
       haproxy \
-      kernel \
-      systemd \
-      grub2-pc \
-      dracut && \
-    dnf clean all && \
-    # Install UEFI bootloader packages depending on architecture
-    arch=$(uname -m); \
-    if [ "$arch" = "x86_64" ]; then \
-        dnf install -y grub2-efi-x64 shim-x64; \
-    elif [ "$arch" = "aarch64" ]; then \
-        dnf install -y grub2-efi-aa64 shim-aa64; \
-    fi && \
-    dnf clean all
+      vim-minimal \
+    && dnf clean all
 
-# Generate initramfs for the installed kernel (force overwrite if exists)
-RUN dracut --force --kver "$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}' kernel-core)"
+# Switch from NetworkManager to systemd-networkd
+# RUN systemctl enable systemd-networkd.service \
+#     && systemctl enable systemd-resolved.service \
+#     && systemctl mask NetworkManager.service \
+#     && systemctl mask NetworkManager-dispatcher.service
 
-# Run bootc lint to verify the image is bootc-compatible
-RUN bootc container lint || (echo "Bootc lint failed" && exit 1)
+COPY shared/99-custom_shell.sh /etc/profile.d/99-custom_shell.sh
+COPY shared/virc /etc/virc
 
-# Set the default command to systemd (for completeness, when running the container)
+# Install k0s
+RUN curl -sSf https://get.k0s.sh | sh
+RUN mkdir -p /var/lib/cni && \
+    ln -s /var/lib/cni /opt/cni
+
+# Install stern
+RUN curl -kL -o /tmp/stern.tgz https://github.com/stern/stern/releases/download/v1.32.0/stern_1.32.0_linux_amd64.tar.gz && \
+    tar -xzpf /tmp/stern.tgz -C /usr/local/bin/
+
+# Disable and mask unnecessary services to reduce attack surface
+RUN systemctl mask \
+      avahi-daemon.service \
+      avahi-daemon.socket \
+      bluetooth.service \
+      systemd-homed.service \
+      systemd-homed-activate.service \
+      pcscd.socket \
+      udisks2.service \
+      irqbalance.service \
+      mdmonitor.service \
+      lvm2-monitor.service \
+      lvm2-lvmpolld.socket \
+      dm-event.socket \
+      remote-cryptsetup.target \
+      remote-fs.target \
+      sssd.service \
+      systemd-pstore.service \
+      systemd-userdbd.socket
+
+# Optional disables (not masked – easy to re-enable later)
+RUN systemctl disable \
+      nfs-client.target \
+      dnf-makecache.timer \
+      rpmdb-migrate.service \
+      rpmdb-rebuild.service
+
 CMD ["/sbin/init"]
