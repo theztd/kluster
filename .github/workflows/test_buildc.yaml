@@ -32,7 +32,7 @@ jobs:
             -v /tmp/bootc-target:/target \
             ${IMAGE}:${TAG} \
             bootc install to-existing-root \
-              --root /target \
+              /target \
               --stateroot testos
 
       - name: Boot image in QEMU and check for DHCP
