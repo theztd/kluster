@@ -1,0 +1,16 @@
+{{- range . }}
+  {{- $critical := 0 }}
+  {{- $high := 0 }}
+  {{- range .Vulnerabilities }}
+    {{- if eq .Severity "CRITICAL" }}{{- $critical = add $critical 1 }}{{- end }}
+    {{- if eq .Severity "HIGH" }}{{- $high = add $high 1 }}{{- end }}
+  {{- end }}
+  {{- if or (gt $critical 0) (gt $high 0) }}
+{{ .Target }}{{ if gt $critical 0 }} {{ $critical }}xCRITICAL{{ end }}{{ if gt $high 0 }} {{ $high }}xHIGH{{ end }}
+    {{- range .Vulnerabilities }}
+      {{- if or (eq .Severity "CRITICAL") (eq .Severity "HIGH") }}
+  - {{ .VulnerabilityID }}: {{ .Title }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}

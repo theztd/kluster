@@ -1,4 +1,4 @@
-name: Build and Scan bootc Image
+name: Scan bootc Image
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-scan:
-    name: Build and Security Scan
+    name: Security Scan
     runs-on: ubuntu-latest
 
     steps:
@@ -26,20 +26,26 @@ jobs:
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
 
       - name: Scan image from GHCR
-        env:
-          TRIVY_USERNAME: ${{ secrets.GITHUB_ACTOR }}
-          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          ls -al 
           trivy image \
-            -f json -o trivy-report.json \
+            -f template  -o trivy-summary.txt \
+            --template '@trivy-summary.tmpl' \
             --exit-code 1 \
             --severity CRITICAL,HIGH \
             --ignore-unfixed \
             --no-progress \
             ${image}:${short_sha}
 
-      - name: Upload report
-        uses: actions/upload-artifact@v4
-        with:
-          name: trivy-report
-          path: trivy-report.json
+      - name: Write Trivy summary to GitHub UI
+        run: |
+          echo '### 🔒 Trivy Security Scan' >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          cat trivy-summary.txt >> $GITHUB_STEP_SUMMARY
+
+
+      # - name: Upload report
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: trivy-report
+      #     path: trivy-report.json
