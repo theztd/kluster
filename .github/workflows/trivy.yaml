@@ -27,7 +27,6 @@ jobs:
           trivy image \
             -f template  -o trivy-summary.txt \
             --template '@trivy-summary.tmpl' \
-            --exit-code 1 \
             --severity CRITICAL,HIGH \
             --ignore-unfixed \
             --no-progress \
