@@ -3,7 +3,9 @@ FROM quay.io/fedora-testing/fedora-bootc:42-minimal AS base
 # Přidej balíčky přes DNF (nutné pro systemd prostředí)
 RUN dnf install -y \
       systemd-networkd \
+      tar \
       htop \
+      tar \
       haproxy \
       vim-minimal \
     && dnf clean all

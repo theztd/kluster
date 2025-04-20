@@ -1,0 +1,69 @@
+name: Test bootc image boot
+
+on:
+  workflow_run:
+    workflows: ["Build bootc image"]
+    types:
+      - completed
+
+jobs:
+  test-boot:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-x86 qemu-utils podman jq
+
+      - name: Set image tag from SHA
+        run: |
+          IMAGE=ghcr.io/${{ github.repository }}
+          TAG=${{ github.event.workflow_run.head_sha }}
+          TAG_SHORT=${TAG::7}
+          echo "IMAGE=${IMAGE}" >> $GITHUB_ENV
+          echo "TAG=${TAG_SHORT}" >> $GITHUB_ENV
+
+      - name: Pull image from GHCR
+        run: |
+          podman pull ${IMAGE}:${TAG}
+
+      - name: Install bootc image to raw disk
+        run: |
+          mkdir /tmp/testos
+          sudo bootc install \
+            --target disk \
+            --image ${IMAGE}:${TAG} \
+            --root /tmp/testos \
+            --stateroot testos
+
+      - name: Boot image in QEMU and check for DHCP
+        run: |
+          LOG=/tmp/qemu-boot.log
+          timeout 90s qemu-system-x86_64 \
+            -m 1024 \
+            -nographic \
+            -cpu max \
+            -drive file=/tmp/testos/disk.img,format=raw,if=virtio \
+            -serial mon:stdio \
+            -append "console=ttyS0 root=LABEL=ROOT ro quiet" | tee "$LOG"
+
+          echo "✅ Boot log captured:"
+          tail -n 20 "$LOG"
+
+          grep -q "Reached target Multi-User System" "$LOG" || {
+            echo "❌ Systemd did not reach multi-user target"; exit 1; }
+
+          grep -q "DHCPACK" "$LOG" || grep -q "bound to" "$LOG" || {
+            echo "❌ No DHCP lease obtained"; exit 1; }
+
+      - name: Upload boot log
+        uses: actions/upload-artifact@v4
+        with:
+          name: qemu-boot-log
+          path: /tmp/qemu-boot.log
