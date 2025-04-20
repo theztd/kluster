@@ -1,13 +1,15 @@
 name: Scan bootc Image
 
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_run:
+    workflows: ["Build bootc image"]
+    types:
+      - completed
 
 jobs:
   build-and-scan:
     name: Security Scan
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
