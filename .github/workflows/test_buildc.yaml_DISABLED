@@ -1,3 +1,6 @@
+# Requires my own github runner and env to finalize this testing
+
+
 name: Test bootc image boot
 
 on:

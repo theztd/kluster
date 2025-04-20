@@ -1,4 +1,4 @@
-FROM quay.io/fedora-testing/fedora-bootc:42-minimal AS base
+FROM quay.io/centos-bootc/centos-bootc:stream9 AS base
 
 # Install minimal set of tools
 RUN dnf install -y --setopt=install_weak_deps=False \
