@@ -74,11 +74,5 @@ RUN systemctl mask \
       systemd-pstore.service \
       systemd-userdbd.socket
 
-# Optional disables (easy to re-enable later)
-RUN systemctl disable \
-      nfs-client.target \
-      dnf-makecache.timer \
-      rpmdb-migrate.service \
-      rpmdb-rebuild.service
 
 CMD ["/sbin/init"]
