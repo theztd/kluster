@@ -3,7 +3,8 @@ FROM quay.io/centos-bootc/centos-bootc:stream9 AS base
 LABEL org.osbuild.ostree.bootable=true
 
 # Install minimal tools and oldschool network stack
-RUN dnf install -y --setopt=install_weak_deps=False \
+RUN dnf install -y epel-release && \
+    dnf install -y --setopt=install_weak_deps=False \
       initscripts \
       openssh-server \
       tar \
