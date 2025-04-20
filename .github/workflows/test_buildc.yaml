@@ -28,7 +28,7 @@ jobs:
 
           mkdir -p /tmp/bootc-target
 
-          podman run --rm \
+          podman run --rm --privileged \
             -v /tmp/bootc-target:/target \
             ${IMAGE}:${TAG} \
             bootc install to-existing-root \
