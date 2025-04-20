@@ -1,4 +1,4 @@
-FROM registry.gitlab.com/fedora/bootc/base-images/fedora-bootc-minimal:40-amd64 AS base
+FROM quay.io/fedora-testing/fedora-bootc:42-minimal AS base
 
 # Přidej balíčky přes DNF (nutné pro systemd prostředí)
 RUN dnf install -y \
