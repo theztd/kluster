@@ -1,14 +1,16 @@
 FROM quay.io/fedora-testing/fedora-bootc:42-minimal AS base
 
-# Přidej balíčky přes DNF (nutné pro systemd prostředí)
-RUN dnf install -y \
+# Install minimal set of tools
+RUN dnf install -y --setopt=install_weak_deps=False \
       systemd-networkd \
       tar \
       htop \
       tar \
       haproxy \
-      vim-minimal \
-    && dnf clean all
+      helm \
+      vim-minimal && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf /var/lib/dnf
 
 # Switch from NetworkManager to systemd-networkd
 # RUN systemctl enable systemd-networkd.service \
