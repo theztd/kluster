@@ -21,16 +21,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qemu-system-x86 qemu-utils podman jq
 
-      - name: Set image tag from SHA
-        run: |
-          IMAGE=ghcr.io/${{ github.repository }}
-          TAG=${{ github.event.workflow_run.head_sha }}
-          TAG_SHORT=${TAG::7}
-          echo "IMAGE=${IMAGE}" >> $GITHUB_ENV
-          echo "TAG=${TAG_SHORT}" >> $GITHUB_ENV
-
       - name: Install system with bootc from your image
         run: |
+          IMAGE=ghcr.io/${{ github.repository }}
+          TAG=$(git rev-parse --short ${{ github.sha }})
+
           mkdir -p /tmp/bootc-target
 
           podman run --rm \
