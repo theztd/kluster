@@ -19,7 +19,7 @@ RUN dnf install -y \
 COPY shared/99-custom_shell.sh /etc/profile.d/99-custom_shell.sh
 COPY shared/virc /etc/virc
 
-# Install k0s
+# Install latest k0s version
 RUN curl -sSf https://get.k0s.sh | sh
 RUN mkdir -p /var/lib/cni && \
     ln -s /var/lib/cni /opt/cni

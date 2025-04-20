@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y qemu-system-x86 qemu-utils podman jq bootc
+          sudo apt-get install -y qemu-system-x86 qemu-utils podman jq
 
       - name: Set image tag from SHA
         run: |
@@ -29,18 +29,18 @@ jobs:
           echo "IMAGE=${IMAGE}" >> $GITHUB_ENV
           echo "TAG=${TAG_SHORT}" >> $GITHUB_ENV
 
-      - name: Pull image from GHCR
+      - name: Install system with bootc from your image
         run: |
-          podman pull ${IMAGE}:${TAG}
+          mkdir -p /tmp/bootc-target
 
-      - name: Install bootc image to raw disk
-        run: |
-          mkdir /tmp/testos
-          sudo bootc install \
-            --target disk \
-            --image ${IMAGE}:${TAG} \
-            --root /tmp/testos \
-            --stateroot testos
+          podman run --rm \
+            -v /tmp/bootc-target:/target \
+            ${IMAGE}:${TAG} \
+            bootc install \
+              --target disk \
+              --image ${IMAGE}:${TAG} \
+              --root /target \
+              --stateroot testos
 
       - name: Boot image in QEMU and check for DHCP
         run: |
@@ -49,7 +49,7 @@ jobs:
             -m 1024 \
             -nographic \
             -cpu max \
-            -drive file=/tmp/testos/disk.img,format=raw,if=virtio \
+            -drive file=/tmp/bootc-target/disk.img,format=raw,if=virtio \
             -serial mon:stdio \
             -append "console=ttyS0 root=LABEL=ROOT ro quiet" | tee "$LOG"
 
@@ -57,10 +57,10 @@ jobs:
           tail -n 20 "$LOG"
 
           grep -q "Reached target Multi-User System" "$LOG" || {
-            echo "❌ Systemd did not reach multi-user target"; exit 1; }
+            echo "❌ systemd nenaběhl"; exit 1; }
 
           grep -q "DHCPACK" "$LOG" || grep -q "bound to" "$LOG" || {
-            echo "❌ No DHCP lease obtained"; exit 1; }
+            echo "❌ DHCP nefunguje"; exit 1; }
 
       - name: Upload boot log
         uses: actions/upload-artifact@v4
