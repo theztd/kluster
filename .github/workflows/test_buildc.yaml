@@ -36,8 +36,7 @@ jobs:
           podman run --rm \
             -v /tmp/bootc-target:/target \
             ${IMAGE}:${TAG} \
-            bootc install \
-              --target disk \
+            bootc install to-existing-root \
               --image ${IMAGE}:${TAG} \
               --root /target \
               --stateroot testos
