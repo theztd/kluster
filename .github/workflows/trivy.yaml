@@ -16,20 +16,14 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Set image variables
-        id: vars
-        run: |
-          IMAGE=ghcr.io/${{ github.repository }}
-          echo "image=${IMAGE,,}" >> "$GITHUB_OUTPUT"
-          echo "short_sha=$(git rev-parse --short ${{ github.sha }})" >> "$GITHUB_OUTPUT"
-
       - name: Install Trivy
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
 
       - name: Scan image from GHCR
         run: |
-          ls -al 
+          image=ghcr.io/${{ github.repository }}
+          short_sha=$(git rev-parse --short ${{ github.sha }})
           trivy image \
             -f template  -o trivy-summary.txt \
             --template '@trivy-summary.tmpl' \

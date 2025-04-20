@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - test-build
 
 permissions:
   contents: read
@@ -52,3 +51,15 @@ jobs:
           buildah push ${image}:${short_sha}
           buildah push ${image}:${arch} 
           buildah push ${image}:${arch}-${today}
+
+      - name: Write Build summary to GitHub UI
+        run: |
+          today="$(date +%y%m%d-%H)"
+          image=${{ steps.vars.outputs.image }}
+          short_sha=${{ steps.vars.outputs.short_sha }}
+          echo '### 🎉 Released bootc images' >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          echo " 💿 ${image}:${short_sha}" >> $GITHUB_STEP_SUMMARY
+          echo " 💿  ${image}:${arch}" >> $GITHUB_STEP_SUMMARY
+          echo " 💿  ${image}:${arch}-${today}" >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
