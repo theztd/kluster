@@ -7,7 +7,7 @@ on:
 
   schedule:
     # Kazdou sobotu v 21:30
-    - cron: 30 21 * * 7
+    - cron: '30 19 * * 6'
 
 permissions:
   contents: read
