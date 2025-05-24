@@ -5,7 +5,7 @@ on:
     branches:
       - main
 
-  chedule:
+  schedule:
     # Kazdou sobotu v 21:30
     - cron: 30 21 * * 7
 
