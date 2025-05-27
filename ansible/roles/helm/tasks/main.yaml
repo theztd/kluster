@@ -1,0 +1,16 @@
+---
+- name: Add Helm repository
+  kubernetes.core.helm_repository:
+    name: "{{ helm_chart_name }}"
+    repo_url: "{{ helm_chart_repo }}"
+
+- name: Install or upgrade Helm chart
+  kubernetes.core.helm:
+    name: "{{ helm_chart_name }}"
+    chart_ref: "{{ helm_chart_ref }}"
+    release_namespace: "{{ helm_chart_namespace }}"
+    create_namespace: true
+    chart_version: "{{ helm_chart_version }}"
+    values: "{{ helm_chart_values | default({}) }}"
+    wait: true
+    update_repo_cache: true

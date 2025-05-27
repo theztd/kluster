@@ -1,0 +1,13 @@
+---
+# Example
+# helm_chart_name: ingress-nginx
+# helm_chart_repo: https://kubernetes.github.io/ingress-nginx
+# helm_chart_ref: ingress-nginx/ingress-nginx
+# helm_chart_version: 4.10.0
+# helm_chart_namespace: ingress-nginx
+# helm_chart_values:
+#   controller:
+#     ingressClassResource:
+#       name: nginx
+#     service:
+#       type: NodePort

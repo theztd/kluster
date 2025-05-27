@@ -6,3 +6,24 @@
       tags:
         - cluster
         - cp
+
+# Install platform layer components that will not be managed by ArgoCD
+- name: Finalize platform
+  hosts: controllers
+  roles:
+    - name: Nginx Ingress
+      role: helm
+      when: inventory_hostname == groups['controllers'][0]
+      tags:
+        - helm
+        - ingress
+
+    # - name: Deploy ArgoCD
+    #   ansible.builtin.include_role:
+    #     name: helm
+    #   vars: "{{ argo_vars }}"
+    #   when: inventory_hostname == groups['controllers'][0]
+
+    # Prometheus crd
+
+    # Log shipping

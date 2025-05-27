@@ -24,3 +24,20 @@
     name: k0scontroller.service
     enabled: true
     state: started
+
+- name: Ensure /root/.kube directory exists
+  file:
+    path: /root/.kube
+    state: directory
+    mode: '0700'
+    owner: root
+    group: root
+
+- name: Symlink k0s kubeconfig to /root/.kube/config
+  file:
+    src: /var/lib/k0s/pki/admin.conf
+    dest: /root/.kube/config
+    state: link
+    force: yes
+    owner: root
+    group: root

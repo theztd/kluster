@@ -1,0 +1,37 @@
+---
+argo_vars:
+  helm_chart_name: argocd
+  helm_chart_repo: https://argoproj.github.io/argo-helm
+  helm_chart_ref: argo/argo-cd
+  helm_chart_namespace: argocd
+  helm_chart_values:
+    server:
+      insecure: true
+    ingress:
+      enabled: true
+      annotations: {}
+        # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+        # nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+      ingressClassName: "nginx-ingress"
+      #hostname: ""
+      path: /
+      pathType: Prefix
+      tls: false
+
+
+
+    crds:
+      install: true
+    global:
+      domain: argocd.check-this.link
+      image:
+        tags: ""
+      addPrometheusAnnotations: false
+    # configs:
+    # secret:
+      # `htpasswd -nbBC 10 "" $ARGO_PWD | tr -d ':\n' | sed 's/$2y/$2a/'`
+      # argocdServerAdminPassword: ""
+    cm:
+      create: true
+      admin.enabled: true
+    styles: ""

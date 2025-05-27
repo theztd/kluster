@@ -4,6 +4,6 @@ cp-1 ansible_ssh_host=135.181.96.187
 [workers]
 w-1 ansible_ssh_host=37.27.91.115
 
-[cluster:child]
+[cluster:children]
 controllers
 workers
