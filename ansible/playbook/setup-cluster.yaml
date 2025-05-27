@@ -14,15 +14,30 @@
     - name: Nginx Ingress
       role: helm
       when: inventory_hostname == groups['controllers'][0]
+      vars:
+        helm_chart_name: ingress-nginx
+        helm_chart_repo: https://kubernetes.github.io/ingress-nginx
+        helm_chart_ref: ingress-nginx/ingress-nginx
+        helm_chart_version: "4.10.0"
+        helm_chart_namespace: ingress-nginx
+        helm_chart_values: "{{ nginx_ingress_values }}"
       tags:
         - helm
         - ingress
 
-    # - name: Deploy ArgoCD
-    #   ansible.builtin.include_role:
-    #     name: helm
-    #   vars: "{{ argo_vars }}"
-    #   when: inventory_hostname == groups['controllers'][0]
+    - name: Deploy ArgoCD
+      role: helm
+      when: inventory_hostname == groups['controllers'][0]
+      vars:
+        helm_chart_name: argocd
+        helm_chart_repo: https://argoproj.github.io/argo-helm
+        helm_chart_ref: argocd/argo-cd
+        helm_chart_namespace: argocd
+        helm_chart_version: "8.0.10"
+        helm_chart_values: "{{ argocd_values }}"
+      tags:
+        - helm
+        - argocd
 
     # Prometheus crd
 
