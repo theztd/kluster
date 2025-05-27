@@ -31,9 +31,6 @@ RUN mkdir -p /etc/systemd/network && \
     echo '[Network]' >> /etc/systemd/network/10-default.network && \
     echo 'DHCP=yes' >> /etc/systemd/network/10-default.network
 
-# Kernel cmdline tweak for predictable eth0 naming (optional)
-RUN echo 'net.ifnames=0 biosdevname=0' > /etc/kernel/cmdline
-
 # Custom shell environment
 COPY shared/99-custom_shell.sh /etc/profile.d/99-custom_shell.sh
 COPY shared/virc /etc/virc
